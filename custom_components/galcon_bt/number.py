@@ -35,8 +35,8 @@ class GalconDurationNumber(NumberEntity):
     """Number entity to set irrigation duration in minutes."""
 
     _attr_has_entity_name = True
-    _attr_native_min_value = 1
-    _attr_native_max_value = 120
+    _attr_native_min_value = 0
+    _attr_native_max_value = 40
     _attr_native_step = 1
     _attr_native_unit_of_measurement = UnitOfTime.MINUTES
     _attr_mode = NumberMode.SLIDER

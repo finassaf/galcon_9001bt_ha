@@ -98,7 +98,7 @@ class GalconBTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_ADDRESS): vol.In(device_options),
                     vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
                     vol.Optional(CONF_DURATION, default=DEFAULT_DURATION): vol.All(
-                        int, vol.Range(min=1, max=120)
+                        int, vol.Range(min=0, max=40)
                     ),
                 }
             ),
@@ -140,7 +140,7 @@ class GalconBTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_ADDRESS): str,
                     vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
                     vol.Optional(CONF_DURATION, default=DEFAULT_DURATION): vol.All(
-                        int, vol.Range(min=1, max=120)
+                        int, vol.Range(min=0, max=40)
                     ),
                 }
             ),
@@ -182,7 +182,7 @@ class GalconBTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 {
                     vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
                     vol.Optional(CONF_DURATION, default=DEFAULT_DURATION): vol.All(
-                        int, vol.Range(min=1, max=120)
+                        int, vol.Range(min=0, max=40)
                     ),
                 }
             ),

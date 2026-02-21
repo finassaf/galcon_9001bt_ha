@@ -184,3 +184,25 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
         except (ConnectionError, Exception):
             self._set_operation_state(OperationState.ERROR)
             raise
+
+    def async_irrigation_ended(self) -> None:
+        """Called when the local countdown reaches zero.
+
+        Updates cached status to valve-closed and disables scanning
+        to conserve battery.
+        """
+        _LOGGER.info(
+            "Galcon %s: irrigation timer expired — marking valve closed and disabling scanning",
+            self.device.address,
+        )
+        self._last_known_status = GalconStatus(
+            valve_open=False,
+            manual_open=False,
+            hours_remaining=0,
+            minutes_remaining=0,
+            seconds_remaining=0,
+            raw=self._last_known_status.raw if self._last_known_status else b"",
+            battery_level=self._last_known_status.battery_level if self._last_known_status else None,
+        )
+        self.async_set_updated_data(self._last_known_status)
+        self.set_polling(False)

@@ -219,6 +219,8 @@ class GalconTimeRemainingSensor(CoordinatorEntity[GalconCoordinator], SensorEnti
         if self._remaining_seconds() <= 0:
             self._end_time = None
             self._cancel_timer()
+            # Irrigation finished — update valve status and disable scanning
+            self.coordinator.async_irrigation_ended()
         self.async_write_ha_state()
 
     def _ensure_timer(self) -> None:

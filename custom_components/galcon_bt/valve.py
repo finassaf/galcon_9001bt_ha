@@ -93,8 +93,8 @@ class GalconValve(CoordinatorEntity[GalconCoordinator], ValveEntity):
 
     @property
     def available(self) -> bool:
-        """Return True when polling is enabled."""
-        return self.coordinator.polling_enabled
+        """Available when scanning is on, or when we have a cached status."""
+        return self.coordinator.polling_enabled or self.coordinator.data is not None
 
     async def async_open_valve(self, **kwargs: Any) -> None:
         """Open the irrigation valve using the configured duration."""
