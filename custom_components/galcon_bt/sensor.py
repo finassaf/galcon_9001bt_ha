@@ -49,6 +49,7 @@ async def async_setup_entry(
         GalconOperationSensor(coordinator, name, address),
         GalconTimeRemainingSensor(coordinator, name, address),
         GalconBatterySensor(coordinator, name, address),
+        GalconLastIrrigationSensor(coordinator, name, address),
     ])
 
 
@@ -292,3 +293,56 @@ class GalconBatterySensor(CoordinatorEntity[GalconCoordinator], SensorEntity):
     def available(self) -> bool:
         """Available once we have at least one battery reading."""
         return self._cached_battery is not None
+
+
+class GalconLastIrrigationSensor(CoordinatorEntity[GalconCoordinator], SensorEntity):
+    """Sensor showing when the last irrigation occurred and for how long.
+
+    Displays the date/time of the most recent irrigation session.
+    Duration is available as an extra attribute.
+    """
+
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:history"
+
+    def __init__(
+        self,
+        coordinator: GalconCoordinator,
+        name: str,
+        address: str,
+    ) -> None:
+        """Initialize the last irrigation sensor."""
+        super().__init__(coordinator)
+        self._address = address
+        self._attr_name = "Last Irrigation"
+        self._attr_unique_id = (
+            f"galcon_bt_{address.replace(':', '_').lower()}_last_irrigation"
+        )
+        self._attr_device_info = {
+            "identifiers": {(DOMAIN, address)},
+            "name": name,
+            "manufacturer": "Galcon",
+            "model": "9001BT",
+            "connections": {("bluetooth", address)},
+        }
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the start time of the last irrigation as a readable timestamp."""
+        start = self.coordinator.last_irrigation_start
+        if start is None:
+            return None
+        return start.strftime("%Y-%m-%d %H:%M")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return duration of the last irrigation."""
+        attrs: dict[str, Any] = {}
+        if self.coordinator.last_irrigation_duration_min is not None:
+            attrs["duration_minutes"] = self.coordinator.last_irrigation_duration_min
+        return attrs
+
+    @property
+    def available(self) -> bool:
+        """Available once at least one irrigation has been recorded."""
+        return self.coordinator.last_irrigation_start is not None

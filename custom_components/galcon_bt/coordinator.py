@@ -44,6 +44,12 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
         self._base_interval = scan_interval or DEFAULT_SCAN_INTERVAL
         self.duration_minutes: int = 20  # overridden by NumberEntity on setup
 
+        # Last irrigation tracking
+        self.last_irrigation_start: datetime | None = None
+        self.last_irrigation_duration_min: int | None = None
+        self._current_irrigation_start: datetime | None = None
+        self._current_irrigation_duration: int = 0
+
         # Operation state tracking for UI feedback
         self.operation_state: OperationState = OperationState.IDLE
         self._state_listeners: list = []
@@ -131,6 +137,24 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
                 f"Cannot reach Galcon device (no cached state): {err}"
             ) from err
 
+    def _record_irrigation_start(self, duration_minutes: int) -> None:
+        """Record the start of an irrigation session."""
+        self._current_irrigation_start = dt_util.now()
+        self._current_irrigation_duration = duration_minutes
+
+    def _record_irrigation_end(self) -> None:
+        """Finalize the last irrigation record."""
+        if self._current_irrigation_start is not None:
+            self.last_irrigation_start = self._current_irrigation_start
+            self.last_irrigation_duration_min = self._current_irrigation_duration
+            self._current_irrigation_start = None
+            _LOGGER.info(
+                "Galcon %s: irrigation recorded — %s for %d min",
+                self.device.address,
+                self.last_irrigation_start.strftime("%Y-%m-%d %H:%M"),
+                self.last_irrigation_duration_min,
+            )
+
     async def async_open_valve(
         self, hours: int = 0, minutes: int = 0, seconds: int = 0
     ) -> None:
@@ -156,6 +180,7 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
                     raw=self._last_known_status.raw if self._last_known_status else b"",
                     battery_level=self._last_known_status.battery_level if self._last_known_status else None,
                 )
+            self._record_irrigation_start(hours * 60 + minutes + (1 if seconds else 0))
             self.async_set_updated_data(self._last_known_status)
         except (ConnectionError, Exception):
             self._set_operation_state(OperationState.ERROR)
@@ -168,6 +193,7 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
             self._set_operation_state(OperationState.CLOSING)
             real_status = await self.device.close_valve()
             self._set_operation_state(OperationState.CONFIRMED)
+            self._record_irrigation_end()
             if real_status:
                 self._last_known_status = real_status
             else:
@@ -195,6 +221,7 @@ class GalconCoordinator(DataUpdateCoordinator[GalconStatus]):
             "Galcon %s: irrigation timer expired — marking valve closed and disabling scanning",
             self.device.address,
         )
+        self._record_irrigation_end()
         self._last_known_status = GalconStatus(
             valve_open=False,
             manual_open=False,
