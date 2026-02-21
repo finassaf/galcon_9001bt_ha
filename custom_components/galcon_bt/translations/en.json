@@ -1,0 +1,38 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Select Galcon Device",
+                "description": "Found {count} Galcon device(s). Select your controller below.",
+                "data": {
+                    "address": "Device",
+                    "name": "Name",
+                    "duration": "Default irrigation duration (minutes)"
+                }
+            },
+            "manual": {
+                "title": "Manual Setup",
+                "description": "No Galcon devices found nearby. Enter the Bluetooth address manually.",
+                "data": {
+                    "address": "Bluetooth Address (AA:BB:CC:DD:EE:FF)",
+                    "name": "Name",
+                    "duration": "Default irrigation duration (minutes)"
+                }
+            },
+            "bluetooth_confirm": {
+                "title": "Galcon BT Discovered",
+                "description": "A Galcon irrigation controller was discovered at {address}. Would you like to set it up?",
+                "data": {
+                    "name": "Name",
+                    "duration": "Default irrigation duration (minutes)"
+                }
+            }
+        },
+        "error": {
+            "invalid_address": "Invalid Bluetooth address format. Use AA:BB:CC:DD:EE:FF."
+        },
+        "abort": {
+            "already_configured": "This device is already configured."
+        }
+    }
+}

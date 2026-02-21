@@ -1,0 +1,42 @@
+open_valve_timed:
+  name: Open valve with timer
+  description: Open the Galcon irrigation valve for a specified duration.
+  fields:
+    entity_id:
+      name: Entity
+      description: The Galcon switch entity to control.
+      required: true
+      selector:
+        entity:
+          integration: galcon_bt
+          domain: switch
+    hours:
+      name: Hours
+      description: Number of hours to keep the valve open (0-23).
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 23
+          mode: box
+    minutes:
+      name: Minutes
+      description: Number of minutes to keep the valve open (0-59).
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 59
+          mode: box
+    seconds:
+      name: Seconds
+      description: Number of seconds to keep the valve open (0-59).
+      required: false
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 59
+          mode: box
