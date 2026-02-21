@@ -2,6 +2,8 @@
 
 A custom Home Assistant integration for the **Galcon 9001BT** Bluetooth irrigation controller.
 
+This integration builds upon the Galcon controller implementation from [suborb/GalconController](https://github.com/suborb/GalconController).
+
 ![Dashboard Screenshot](docs/screenshot.png)
 
 ## Features

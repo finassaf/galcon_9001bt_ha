@@ -4,7 +4,7 @@
     "codeowners": [],
     "config_flow": true,
     "dependencies": [],
-    "documentation": "https://github.com/suborb/GalconController",
+    "documentation": "https://github.com/finassaf/galcon_9001bt_ha",
     "iot_class": "local_polling",
     "requirements": [
         "bleak>=0.21.0",
